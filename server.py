@@ -14,14 +14,14 @@ chat_member_array = []
 """defines a chat_member and holds their data for chat room use"""
 class chat_member:
     def __init__(self,client_socket,client_address):
-        self.is_available = None
+        self.is_available = True
         self.name = None
         self.socket = client_socket
         self.address = client_address
     def set_name(self,name):
         self.name = name
     def set_is_available(self, is_available):
-        self.is_available = True
+        self.is_available = is_available
     def get_name_and_ip(self):
         if self.is_available:
             return f'{self.name} @ {self.address}'
@@ -37,6 +37,12 @@ def create_server():
     server_socket.bind(('127.0.0.1', 1000))
     server_socket.listen(5)
     return server_socket
+"""prints the server started and the ip/port it started on"""
+def print_information():
+    server_address = '127.0.0.1'
+    server_port = 1000
+    print(f"server started on {server_address} @ {server_port}")
+    print("-"*50+"\n")
 
 """handles the client's connection to the server"""
 def handle_client(chat_member):
@@ -101,8 +107,10 @@ def start_session(requested_member, current_member):
 #main:
 def main():
     server_socket = create_server()
+    print_information()
     while True:
         client_socket, client_address = server_socket.accept()
+        print(f"accepted client {client_address}")
         temp = chat_member(client_socket,client_address)
         chat_member_array.append(temp)
         threading.Thread(target=handle_client, args=(temp,)).start()
