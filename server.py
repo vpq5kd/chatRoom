@@ -3,6 +3,7 @@ import socket
 import threading
 import os
 
+
 #general issues/imporvements:
 # *currently need a way to handle connections between clients better,
 # i.e, "x wants to connect with you, would you like to chat?"
@@ -11,6 +12,10 @@ import os
 
 #global variables:
 chat_member_array = []
+
+SERVER_ADDRESS = '127.0.0.1'
+SERVER_PORT = 8888
+
 ACCEPTED_IP = '0'.encode('utf-8')
 NOT_ACCEPTED_IP = '1'.encode('utf-8')
 
@@ -41,13 +46,13 @@ class chat_member:
 """creates the server"""
 def create_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('127.0.0.1', 8888))
+    server_socket.bind((SERVER_ADDRESS, SERVER_PORT))
     server_socket.listen(5)
     return server_socket
 """prints the server started and the ip/port it started on"""
 def print_information():
-    server_address = '127.0.0.1'
-    server_port = 8888
+    server_address = SERVER_ADDRESS
+    server_port = SERVER_PORT
     print(f"server started on {server_address} @ {server_port}")
     print("-"*50+"\n")
 
