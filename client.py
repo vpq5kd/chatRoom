@@ -20,6 +20,11 @@ def create_socket():
     client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     return client_socket
 
+"""listen for connections from other chatters"""
+
+def  listen_for_chatters():
+
+
 """handles a chat between the other client. (empty placeholder"""
 def start_chatting():
     return
@@ -43,29 +48,32 @@ def main():
         server_hello = client_socket.recv(1024).decode(UTF_8)
         print(server_hello)
 
-        #get available members:
-        members_list = client_socket.recv(4096).decode(UTF_8)
-        print(members_list)
-        list_received = MESSAGE_RECEIVED
-        client_socket.send(list_received)
-        enter_name = client_socket.recv(1024).decode(UTF_8)
-        print(enter_name)
+        chatting = False
+        while not chatting:
+            lis
+            #get available members:
+            members_list = client_socket.recv(4096).decode(UTF_8)
+            print(members_list)
+            list_received = MESSAGE_RECEIVED
+            client_socket.send(list_received)
+            enter_name = client_socket.recv(1024).decode(UTF_8)
+            print(enter_name)
 
-        #'connect' with a client
+            #'connect' with a client
 
-        connected = False
-        while(not connected):
-            person_to_chat = input().encode(UTF_8)
-            client_socket.send(person_to_chat)
-            is_person_real = int(client_socket.recv(1024).decode(UTF_8))
-            if is_person_real == REAL_PERSON:
-                start_session = client_socket.recv(1024).decode(UTF_8)
-                print(start_session)
-                start_chatting()
-                break
-            elif is_person_real == NOT_REAL_PERSON:
-                not_real = client_socket.recv(1024).decode(UTF_8)
-                print(not_real)
+            connected = False
+            while(not connected):
+                person_to_chat = input().encode(UTF_8)
+                client_socket.send(person_to_chat)
+                is_person_real = int(client_socket.recv(1024).decode(UTF_8))
+                if is_person_real == REAL_PERSON:
+                    start_session = client_socket.recv(1024).decode(UTF_8)
+                    print(start_session)
+                    start_chatting()
+                    break
+                elif is_person_real == NOT_REAL_PERSON:
+                    not_real = client_socket.recv(1024).decode(UTF_8)
+                    print(not_real)
 
 
 

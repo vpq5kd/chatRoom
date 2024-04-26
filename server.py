@@ -9,6 +9,8 @@ import os
 # i.e, "x wants to connect with you, would you like to chat?"
 #
 # *when a connection happens it doesn't override the other person's conversation, need to fix that behavior
+#
+# *perhaps instead of querying during the server/client hello, I should send them to a continuous listening wait-room.
 
 #global variables:
 chat_member_array = []
@@ -18,6 +20,8 @@ SERVER_PORT = 8888
 
 ACCEPTED_IP = '0'.encode('utf-8')
 NOT_ACCEPTED_IP = '1'.encode('utf-8')
+
+SEND_REQUEST = '3'.encode('utf-8')
 
 #classes:
 """defines a chat_member and holds their data for chat room use"""
@@ -69,54 +73,64 @@ def handle_client(chat_member):
     client_connection.send(server_hello)
     chat_member.set_name(client_name)
 
-    #sends the available member info to the client
-    chat_member_info = [member.get_name_and_ip() for member in chat_member_array]
-    chat_member_as_string = "\n".join(chat_member_info)
-    chat_members = f"\nHere is the list of people available to chat with:\n{chat_member_as_string}".encode('utf-8')
-    client_connection.send(chat_members)
-    list_sent = client_connection.recv(1024).decode('utf-8')
+    #establishes a connection between two clients
+    chatting = False
+    repeat = False
+    while(not chatting):
 
-    #allows the client to choose who they want to chat with
-    enter_name = "\nplease enter the name of the person you'd like to chat with:".encode('utf-8')
-    client_connection.send(enter_name)
-    connected = False
-    while(not connected):
-        test_requested_member = None
-        test_requested_name= client_connection.recv(1024).decode('utf-8')
-        is_member = False
-        for member in chat_member_array:
-            if test_requested_name == member.get_name():
-                client_connection.send(ACCEPTED_IP)
-                test_requested_member = member
-                is_member = True
-                connected = True
-                break
-        if(not is_member):
-            client_connection.send(NOT_ACCEPTED_IP)
-            not_member = f"{test_requested_name} is not a valid name, please try again:".encode('utf-8')
-            client_connection.send(not_member)
-            continue
+        #sends a message that the previous connection attempt refused.
+        if repeat:
+            repeat_message = "connection refused, please try again".encode('utf-8')
+            client_connection.send(repeat_message)
 
-    #once the client is chosen, begin sending messages
-    requested_member_name_ip = test_requested_member.get_name_and_ip()
-    starting_session = f"\nstarting session with {requested_member_name_ip}...".encode('utf-8')
-    client_connection.send(starting_session)
-    test_requested_member.set_is_available(False)
-    chat_member.set_is_available(False)
-    start_session(test_requested_member,chat_member)
+        #sends the available member info to the client
+        chat_member_info = [member.get_name_and_ip() for member in chat_member_array]
+        chat_member_as_string = "\n".join(chat_member_info)
+        chat_members = f"\nHere is the list of people available to chat with:\n{chat_member_as_string}".encode('utf-8')
+        client_connection.send(chat_members)
+        list_sent = client_connection.recv(1024).decode('utf-8')
+
+        #allows the client to choose who they want to chat with
+        enter_name = "\nplease enter the name of the person you'd like to chat with:".encode('utf-8')
+        client_connection.send(enter_name)
+        connected = False
+        while(not connected):
+            test_requested_member = None
+            test_requested_name= client_connection.recv(1024).decode('utf-8')
+            is_member = False
+            for member in chat_member_array:
+                if test_requested_name == member.get_name():
+                    client_connection.send(ACCEPTED_IP)
+                    test_requested_member = member
+                    is_member = True
+                    connected = True
+                    break
+            if(not is_member):
+                client_connection.send(NOT_ACCEPTED_IP)
+                not_member = f"{test_requested_name} is not a valid name, please try again:".encode('utf-8')
+                client_connection.send(not_member)
+                continue
+
+        #sends the request to the requested client:
+        send_request = SEND_REQUEST
+        test_requested_member.get_socket().send(send_request)
+        answered_request = test_requested_member.get_socket().recv(1024).decode('utf-8')
+        if (int(answered_request) == 3):
+            chatting = True
+            #once the client is chosen and accepted, begin sending messages
+            requested_member_name_ip = test_requested_member.get_name_and_ip()
+            starting_session = f"\nstarting session with {requested_member_name_ip}...".encode('utf-8')
+            client_connection.send(starting_session)
+            test_requested_member.set_is_available(False)
+            chat_member.set_is_available(False)
+            start_session(test_requested_member,chat_member)
+        else:
+            repeat = True
 
 """starts a chat session between two clients."""
 
 def start_session(requested_member, current_member):
     return
-
-
-
-
-
-
-
-
 
 
 
