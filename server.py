@@ -67,6 +67,7 @@ def handle_client(chat_member):
     chat_member_as_string = "\n".join(chat_member_info)
     chat_members = f"\nHere is the list of people available to chat with:\n{chat_member_as_string}".encode('utf-8')
     client_connection.send(chat_members)
+    list_sent = client_connection.recv(1024).decode('utf-8')
 
     #allows the client to choose who they want to chat with
     enter_name = "\nplease enter the name of the person you'd like to chat with:".encode('utf-8')

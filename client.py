@@ -7,6 +7,7 @@ SERVER_PORT = 8888
 
 REAL_PERSON = 0
 NOT_REAL_PERSON = 1
+MESSAGE_RECEIVED = '2'.encode('utf-8')
 
 #functions:
 
@@ -41,6 +42,8 @@ def main():
         #get available members:
         members_list = client_socket.recv(4096).decode('utf-8')
         print(members_list)
+        list_received = MESSAGE_RECEIVED
+        client_socket.send(list_received)
         enter_name = client_socket.recv(1024).decode('utf-8')
         print(enter_name)
 
