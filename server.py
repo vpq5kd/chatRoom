@@ -6,6 +6,8 @@ import os
 #general issues/imporvements:
 # *currently need a way to handle connections between clients better,
 # i.e, "x wants to connect with you, would you like to chat?"
+#
+# *when a connection happens it doesn't override the other person's conversation, need to fix that behavior
 
 #global variables:
 chat_member_array = []
